@@ -21,6 +21,7 @@ period and an expiry window.
 
 from __future__ import annotations
 
+import math
 import threading
 import time
 from dataclasses import dataclass
@@ -94,6 +95,7 @@ class IntervalTimer:
     """
 
     __slots__ = (
+        "_expiry_intervals",
         "_period_s",
         "_expiry_s",
         "_clock",
@@ -123,6 +125,7 @@ class IntervalTimer:
 
         self._period_s = float(period_s)
         self._expiry_s = None if expiry_s is None else float(expiry_s)
+        self._expiry_intervals = None if expiry_s is None else math.ceil(expiry_s / period_s)
         self._clock = clock
         self._name = name
         self._lock = threading.Lock()
@@ -176,7 +179,7 @@ class IntervalTimer:
                 )
 
             time_since_refresh = reading - self._last_refresh
-            expired = time_since_refresh > self._expiry_s
+            expired = int(time_since_refresh // self._period_s) >= self._expiry_intervals
 
             return TimerTick(
                 now=reading,
