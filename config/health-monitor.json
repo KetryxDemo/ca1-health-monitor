@@ -1,0 +1,48 @@
+{
+  "service_name": "health-monitor",
+  "instance_id": "hm-0",
+  "loop_period_s": 0.25,
+  "shutdown_grace_s": 5.0,
+  "bus_socket": "/run/platform/bus.sock",
+
+  "logging": {
+    "level": "INFO",
+    "format": "json",
+    "include_monotonic": true
+  },
+
+  "memory": {
+    "enabled": true,
+    "scan_period_s": 5.0,
+    "region_bytes": 1048576,
+    "pages_per_slice": 64,
+    "slice_budget_ms": 1.5,
+    "correctable_warn_threshold": 1,
+    "uncorrectable_fault_threshold": 1
+  },
+
+  "storage": {
+    "enabled": true,
+    "scan_period_s": 30.0,
+    "mounts": ["/var/log", "/var/lib/cases"],
+    "free_warn_fraction": 0.2,
+    "free_fault_fraction": 0.08,
+    "probe_write_bytes": 4096,
+    "probe_latency_warn_ms": 40.0,
+    "probe_latency_fault_ms": 250.0,
+    "stall_threshold_s": 120.0
+  },
+
+  "heartbeat": {
+    "enabled": true,
+    "emit_period_s": 1.0,
+    "peer_timeout_s": 3.0,
+    "peers": [
+      "generator-control",
+      "mapping-engine",
+      "catheter-io",
+      "case-recorder"
+    ],
+    "quorum_min_live": 3
+  }
+}

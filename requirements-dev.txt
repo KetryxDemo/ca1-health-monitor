@@ -1,0 +1,7 @@
+# Development and CI dependencies. The service itself has no runtime
+# dependencies outside the Python standard library, which is deliberate:
+# every third-party package on the target has to carry its own SOUP record.
+pytest>=7.4
+pytest-cov>=4.1
+ruff>=0.4
+mypy>=1.8
