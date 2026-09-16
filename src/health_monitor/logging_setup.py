@@ -45,7 +45,7 @@ class JsonFormatter(logging.Formatter):
             "msg": record.getMessage(),
         }
         if self._include_monotonic:
-            payload["monotonic"] = round(time.monotonic(), 6)
+            payload["monotonic_s"] = round(time.monotonic(), 6)
 
         for key, value in record.__dict__.items():
             if key in _RESERVED or key.startswith("_"):

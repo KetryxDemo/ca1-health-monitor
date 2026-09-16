@@ -98,15 +98,26 @@ class MessageBus:
         try:
             self._queue.put_nowait(message)
         except queue.Full:
+            try:
+                evicted = self._queue.get_nowait()
+            except queue.Empty:
+                evicted = None
             self._dropped += 1
             LOGGER.error(
-                "bus queue saturated, dropping message",
-                extra={"topic": topic, "dropped_total": self._dropped},
+                "bus queue saturated, evicting oldest message",
+                extra={
+                    "topic": topic,
+                    "evicted_topic": evicted.topic if evicted else None,
+                    "dropped_total": self._dropped,
+                },
             )
-            return
+            try:
+                self._queue.put_nowait(message)
+            except queue.Full:
+                return
         self._published += 1
 
-    def drain(self, limit: int = 256) -> int:
+    def drain(self, limit: int = 64) -> int:
         """Deliver up to ``limit`` queued messages. Returns the count delivered."""
         delivered = 0
         while delivered < limit:
