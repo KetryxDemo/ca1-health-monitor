@@ -35,7 +35,19 @@ def test_overflow_is_counted_not_raised():
     for index in range(5):
         bus.publish("health.ram", {"index": index})
     assert bus.dropped == 3
-    assert bus.published == 2
+    assert bus.published == 5
+
+
+def test_queue_retains_the_most_recent_messages_when_saturated():
+    bus = MessageBus(max_depth=2)
+    seen = []
+    bus.subscribe("health.ram", seen.append)
+
+    for index in range(5):
+        bus.publish("health.ram", {"index": index})
+    bus.drain()
+
+    assert [m.payload["index"] for m in seen] == [3, 4]
 
 
 def test_failing_subscriber_does_not_block_others():
